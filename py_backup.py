@@ -3,7 +3,7 @@ from datetime import datetime
 
 from base_status import BaseStatus
 from utils import logger_app
-from utils.utils_func import PATH_CURRENT_DATABASES, mysqldump, compress, PATH_BACKUP_DATABASES
+from utils.utils_func import PATH_CURRENT_DATABASES, mysqldump, compress, PATH_BACKUP_DATABASES, sql
 
 log = logger_app.get_logger(__name__)
 
@@ -59,16 +59,9 @@ def backup_by_tables(status_from_files: BaseStatus, status_from_conf: BaseStatus
     """
     Бакапим БД, за исключением BaseStatus.exclude_tables
     """
-    # создаём каталог для бакапа
-    path_backup_db = f'{PATH_BACKUP_DATABASES}/{base}'
-    path_backup_db_data = f'{path_backup_db}/{datetime.now().strftime("%Y-%m-%d")}'
-    if not os.path.isdir(path_backup_db):
-        os.mkdir(path_backup_db)
-    if not os.path.isdir(path_backup_db_data):
-        os.mkdir(path_backup_db_data)
     # ставляем список таблиц
     tables = sql(f'show tables from {base}', base).split('\n')[:-1]
-    #print(f'tables - {tables}')
+    # print(f'tables - {tables}')
     list_exclude_tables_for_save = []
     # исключаем те, что в status_from_conf.exclude_tables и сохраняем этот список исключений в status_from_files
     for table in tables:
@@ -77,11 +70,22 @@ def backup_by_tables(status_from_files: BaseStatus, status_from_conf: BaseStatus
             list_exclude_tables_for_save.append(table)
             log.info(f'исключили {base}.{table}')
             continue
-        backup_table(base, table, path_backup_db_data)
+        backup_table(base, table)
     status_from_files.exclude_tables.update({base: list_exclude_tables_for_save})
 
 
-def backup_table(base: str, table: str, path: str):
+def create_dir_if_need(base: str) -> str:
+    path_backup_db = f'{PATH_BACKUP_DATABASES}/{base}'
+    path_backup_db_data = f'{path_backup_db}/{datetime.now().strftime("%Y-%m-%d")}'
+    if not os.path.isdir(path_backup_db):
+        os.mkdir(path_backup_db)
+    if not os.path.isdir(path_backup_db_data):
+        os.mkdir(path_backup_db_data)
+    return path_backup_db_data
+
+
+def backup_table(base: str, table: str):
+    path = create_dir_if_need(base)
     log.info(f'дампим {base}.{table}...')
     mysqldump(base, table, path)
     log.info(f'архивируем {base}.{table}...')
