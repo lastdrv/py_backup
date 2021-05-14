@@ -1,8 +1,4 @@
-import logging
 import os
-
-logging.basicConfig(filename='py_backup.log', format='%(asctime)s - %(message)s', level=logging.INFO)
-log = logging.getLogger('')
 
 PATH_BACKUP_DATABASES = '/mnt/data/backups/databases'
 PATH_CURRENT_DATABASES = '/mnt/mysql'

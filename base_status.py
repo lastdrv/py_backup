@@ -4,7 +4,10 @@ import os
 from datetime import datetime
 from typing import List
 
-from utils import PATH_CURRENT_DATABASES, log, PATH_BACKUP_DATABASES, CONFIG_FILE
+from utils import logger_app
+from utils.utils_func import PATH_BACKUP_DATABASES, PATH_CURRENT_DATABASES, CONFIG_FILE
+
+log = logger_app.get_logger(__name__)
 
 
 def get_list_backup_dirs(db: str) -> List:

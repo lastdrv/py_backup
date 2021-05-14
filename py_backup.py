@@ -1,9 +1,11 @@
 import os
-import sys
 from datetime import datetime
 
 from base_status import BaseStatus
-from utils import log, PATH_CURRENT_DATABASES, PATH_BACKUP_DATABASES, sql, mysqldump, compress
+from utils import logger_app
+from utils.utils_func import PATH_CURRENT_DATABASES, mysqldump, compress, PATH_BACKUP_DATABASES
+
+log = logger_app.get_logger(__name__)
 
 
 def backup_db():
@@ -99,15 +101,15 @@ def scan_config_db() -> BaseStatus:
     return status_from_conf
 
 
+def backup_system():
+    pass
+
+
+def remove_old():
+    pass
+
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        log.info('Параметры запуска python3 py_backup.py < db | system >')
-        exit(1)
-    if sys.argv[1] == 'db':
-        backup_db()
-        exit(0)
-    if sys.argv[1] == 'system':
-        pass
-        exit(0)
-    log.info('Неверные параметры запуска. Используйте python3 py_backup.py < db | system >')
-    exit(1)
+    backup_db()
+    backup_system()
+    remove_old()
