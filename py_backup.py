@@ -61,7 +61,6 @@ def backup_by_tables(status_from_files: BaseStatus, status_from_conf: BaseStatus
     """
     # ставляем список таблиц
     tables = sql(f'show tables from {base}', base).split('\n')[:-1]
-    # print(f'tables - {tables}')
     list_exclude_tables_for_save = []
     # исключаем те, что в status_from_conf.exclude_tables и сохраняем этот список исключений в status_from_files
     for table in tables:
@@ -109,11 +108,28 @@ def backup_system():
     pass
 
 
-def remove_old():
+def remove_empty_folder():
     pass
+
+
+def remove_old():
+    """
+    Удаляем пустые каталоги.
+    Если в каталоге с бакапами конкретной базы больше 3х непустых каталога,
+    тогда оставляем последний
+        если последний совпадает с первым в этом месяце, то оставляем первый в прошлом и позапрошлом месяце (если они были)
+        если послендний не совпадает с первым в этом месяце, то оставляем их оба и первый в прошлом месяце
+    остальное удаляем
+    """
+    remove_empty_folder()
+    bases = [(i, j, y) for (i, j, y) in os.walk(PATH_BACKUP_DATABASES)][0][1]
+    for base in bases:
+        sub_folders = [(i, j, y) for (i, j, y) in os.walk(f'{PATH_BACKUP_DATABASES}/{base}')][0][1]
+        if len(sub_folders) <= 3:
+            continue
 
 
 if __name__ == '__main__':
     backup_db()
-    backup_system()
-    remove_old()
+    # backup_system()
+    # remove_old()

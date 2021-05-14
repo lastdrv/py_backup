@@ -57,7 +57,7 @@ class BaseStatus:
             for file in os.scandir(f'{PATH_CURRENT_DATABASES}/{db}'):
                 if file.name != 'db.opt':
                     dict_files.update(
-                        {file.name: datetime.fromtimestamp(file.stat().st_atime).strftime('%Y-%m-%d %H:%M')})
+                        {file.name: datetime.fromtimestamp(file.stat().st_mtime).strftime('%Y-%m-%d %H:%M')})
                 else:
                     continue
             self.data.update({db: dict_files})
