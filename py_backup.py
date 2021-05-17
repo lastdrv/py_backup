@@ -38,12 +38,12 @@ def were_there_any_changes(status_from_files: BaseStatus, status_from_conf: Base
     Ищем изменения с последнего бакапа
     """
     for file in status_from_files.data.get(base):
-        # если такой базы в конфиге вообще нет
         if not status_from_conf.data.get(base):
+            log.info(f'{base} такой базы в конфиге вообще нет')
             backup_by_tables(status_from_files, status_from_conf, base)
             return
-        # если файла в конфиге нет
         if not status_from_conf.data.get(base).get(file):
+            log.info(f'{file} файла в конфиге нет')
             backup_by_tables(status_from_files, status_from_conf, base)
             return
         # если дата в конфиге равна дате файла
@@ -108,25 +108,24 @@ def backup_system():
     pass
 
 
-def remove_empty_folder():
-    pass
-
-
 def remove_old():
     """
-    Удаляем пустые каталоги.
     Если в каталоге с бакапами конкретной базы больше 3х непустых каталога,
     тогда оставляем последний
         если последний совпадает с первым в этом месяце, то оставляем первый в прошлом и позапрошлом месяце (если они были)
         если послендний не совпадает с первым в этом месяце, то оставляем их оба и первый в прошлом месяце
     остальное удаляем
     """
-    remove_empty_folder()
     bases = [(i, j, y) for (i, j, y) in os.walk(PATH_BACKUP_DATABASES)][0][1]
     for base in bases:
         sub_folders = [(i, j, y) for (i, j, y) in os.walk(f'{PATH_BACKUP_DATABASES}/{base}')][0][1]
         if len(sub_folders) <= 3:
             continue
+        # для каждого каталога берём дату создания
+        dict_dates = {}
+        for data_dir in sub_folders:
+            dict_dates.update({f'{PATH_BACKUP_DATABASES}/{base}/{data_dir}': datetime.fromtimestamp(os.path.getmtime(f'{PATH_BACKUP_DATABASES}/{base}/{data_dir}')).strftime('%Y-%m-%d')})
+        # удалим из словаря все каталоги которые нам нужны
 
 
 if __name__ == '__main__':

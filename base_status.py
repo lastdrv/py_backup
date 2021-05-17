@@ -30,6 +30,7 @@ class BaseStatus:
     def create_from_config(self):
         log.info('читаем файл конфигурации')
         config = configparser.ConfigParser()
+        config.optionxform = str  # включаем регистрозависимость
         config.read('config.ini')
         self.bases = config.sections()
         for section in config.sections():
@@ -65,6 +66,7 @@ class BaseStatus:
 
     def save_config(self):
         config = configparser.ConfigParser()
+        config.optionxform = str  # включаем регистрозависимость
         for base in sorted(self.bases):
             config[base] = {}
             if base in self.exclude_bases:
